@@ -1,12 +1,23 @@
-    <%- include('partials/header') %>
+<%- include('partials/header') %>
     <main>
         <h1><%= title %></h1>
         <h2>Service Categories</h2>
         <ul>
-            <li>Environmental Conservation - Projects focused on preserving and improving the environment.</li>
-            <li>Education & Tutoring - Opportunities to help students learn and grow.</li>
-            <li>Community Outreach - Programs aimed at supporting local communities.</li>
-            <li>Health & Wellness - Initiatives promoting health and well-being.</li>
+            <% if (categories && categories.length > 0) { %>
+
+                <% categories.forEach(category => { %>
+
+                    <li>
+                        <%= category.name %>
+                    </li>
+
+                <% }) %>
+
+            <% } else { %>
+
+                <li>No categories found.</li>
+
+            <% } %>
         </ul>
     </main>
-    <%- include('partials/footer') %>
+<%- include('partials/footer') %>
