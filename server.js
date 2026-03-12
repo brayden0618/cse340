@@ -46,28 +46,22 @@ app.get('/organizations', async (req, res) => {
 });
 
 app.get('/projects', async (req, res) => {
-    try {
 
-        const projects = await getAllProjects();
+    const projects = await getAllProjects();
 
-        console.log(projects);
+    res.render('projects', {
+        title: 'Service Projects',
+        projects: projects
+    });
 
-        res.render('projects', {
-            title: 'Service Projects',
-            projects: projects
-        });
-
-    } catch (error) {
-        console.error("Error retrieving projects:", error);
-        res.status(500).send("Server Error");
-    }
 });
 
-app.get("/categories", async (req, res) => {
+app.get('/categories', async (req, res) => {
 
     const categories = await getAllCategories();
 
-    res.render("categories", {
+    res.render('categories', {
+        title: 'Project Categories',
         categories: categories
     });
 

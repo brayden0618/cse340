@@ -1,23 +1,23 @@
 <%- include('partials/header') %>
-    <main>
-        <h1><%= title %></h1>
-        <h2>Service Categories</h2>
-        <ul>
-            <% if (categories && categories.length > 0) { %>
 
-                <% categories.forEach(category => { %>
+<main>
 
-                    <li>
-                        <%= category.name %>
-                    </li>
+<h1><%= title %></h1>
 
-                <% }) %>
+<ul>
+<% if (categories && categories.length > 0) { %>
 
-            <% } else { %>
+    <% categories.forEach(category => { %>
+        <li><%= category.name %></li>
+    <% }) %>
 
-                <li>No categories found.</li>
+<% } else { %>
 
-            <% } %>
-        </ul>
-    </main>
+    <li>No categories available.</li>
+
+<% } %>
+</ul>
+
+</main>
+
 <%- include('partials/footer') %>
