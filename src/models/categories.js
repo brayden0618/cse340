@@ -1,6 +1,6 @@
 import pool from "./db.js";
 
-export async function getAllCategories() {
+const getAllCategories = async () => {
     const query = `
         SELECT category_id, name
         FROM category
@@ -10,4 +10,6 @@ export async function getAllCategories() {
     const result = await pool.query(query);
 
     return result.rows;
-}
+};
+
+export { getAllCategories };

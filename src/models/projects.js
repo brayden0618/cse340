@@ -1,6 +1,6 @@
 import pool from './db.js';
 
-export async function getAllProjects() {
+const getAllProjects = async () => {
     const query = `
         SELECT 
             p.project_id,
@@ -17,4 +17,6 @@ export async function getAllProjects() {
 
     const result = await pool.query(query);
     return result.rows;
-}
+};
+
+export { getAllProjects };
