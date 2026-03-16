@@ -47,51 +47,68 @@ app.use((req, res, next) => {
 /**
  * Routes
  */
-app.get('/', async (req, res) => {
-    const title = 'Home';
-    res.render('home', { title });
+
+// Home route
+app.get('/', async (req, res, next) => {
+    try {
+        const title = 'Home';
+        res.render('home', { title });
+    } catch (err) {
+        next(err);
+    }
 });
 
-app.get('/organizations', async (req, res) => {
-    const organizations = await getAllOrganizations();
-    const title = 'Our Partner Organizations';
+// Organizations route
+app.get('/organizations', async (req, res, next) => {
+    try {
+        const organizations = await getAllOrganizations();
+        const title = 'Our Partner Organizations';
 
-    res.render('organizations', { title, organizations });
+        res.render('organizations', { title, organizations });
+    } catch (err) {
+        next(err);
+    }
 });
 
-app.get('/projects', async (req, res) => {
+// Projects route
+app.get('/projects', async (req, res, next) => {
+    try {
+        const projects = await getAllProjects();
 
-    const projects = await getAllProjects();
-
-    res.render('projects', {
-        title: 'Service Projects',
-        projects: projects
-    });
-
+        res.render('projects', {
+            title: 'Service Projects',
+            projects: projects
+        });
+    } catch (err) {
+        next(err);
+    }
 });
 
-app.get('/categories', async (req, res) => {
+// Categories route
+app.get('/categories', async (req, res, next) => {
+    try {
+        const categories = await getAllCategories();
 
-    const categories = await getAllCategories();
-
-    res.render('categories', {
-        title: 'Project Categories',
-        categories: categories
-    });
-
-});
-
-// Catch-all route for 404 errors
-app.use((req, res, next) => {
-    const err = new Error('Page Not Found');
-    err.status = 404;
-    next(err);
+        res.render('categories', {
+            title: 'Project Categories',
+            categories: categories
+        });
+    } catch (err) {
+        next(err);
+    }
 });
 
 // Test route for 500 errors
 app.get('/test-error', (req, res, next) => {
     const err = new Error('This is a test error');
     err.status = 500;
+    next(err);
+});
+
+// Catch-all route for 404 errors
+app.use((req, res, next) => {
+    const err = new Error('Page Not Found');
+    err.status = 404;
     next(err);
 });
 
