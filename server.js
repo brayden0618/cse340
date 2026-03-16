@@ -1,10 +1,8 @@
+import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import express from 'express';
 import { testConnection } from './src/models/db.js';
-import { getAllOrganizations } from './src/models/organizations.js';
-import { getAllProjects } from './src/models/projects.js';
-import { getAllCategories } from './src/models/categories.js';
+import router from './src/controllers/routes.js';
 
 // Define the the application environment
 const NODE_ENV = process.env.NODE_ENV?.toLowerCase() || 'production';
@@ -44,66 +42,8 @@ app.use((req, res, next) => {
     next();
 });
 
-/**
- * Routes
- */
-
-// Home route
-app.get('/', async (req, res, next) => {
-    try {
-        const title = 'Home';
-        res.render('home', { title });
-    } catch (err) {
-        next(err);
-    }
-});
-
-// Organizations route
-app.get('/organizations', async (req, res, next) => {
-    try {
-        const organizations = await getAllOrganizations();
-        const title = 'Our Partner Organizations';
-
-        res.render('organizations', { title, organizations });
-    } catch (err) {
-        next(err);
-    }
-});
-
-// Projects route
-app.get('/projects', async (req, res, next) => {
-    try {
-        const projects = await getAllProjects();
-
-        res.render('projects', {
-            title: 'Service Projects',
-            projects: projects
-        });
-    } catch (err) {
-        next(err);
-    }
-});
-
-// Categories route
-app.get('/categories', async (req, res, next) => {
-    try {
-        const categories = await getAllCategories();
-
-        res.render('categories', {
-            title: 'Project Categories',
-            categories: categories
-        });
-    } catch (err) {
-        next(err);
-    }
-});
-
-// Test route for 500 errors
-app.get('/test-error', (req, res, next) => {
-    const err = new Error('This is a test error');
-    err.status = 500;
-    next(err);
-});
+// Use the imported router to handle routes
+app.use(router);
 
 // Catch-all route for 404 errors
 app.use((req, res, next) => {
