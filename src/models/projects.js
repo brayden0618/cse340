@@ -1,22 +1,49 @@
-import pool from './db.js';
+import db from './db.js';
 
+// Get all projects
 const getAllProjects = async () => {
+
     const query = `
-        SELECT 
-            p.project_id,
-            p.title,
-            p.description,
-            p.location,
-            p.project_date,
-            o.name AS organization_name
-        FROM projects p
-        JOIN organizations o
-        ON p.organization_id = o.organization_id
-        ORDER BY p.project_date;
+        SELECT
+            project_id,
+            organization_id,
+            title,
+            description,
+            location,
+            date
+        FROM project
+        ORDER BY date;
     `;
 
-    const result = await pool.query(query);
+    const result = await db.query(query);
+
     return result.rows;
 };
 
-export { getAllProjects };
+
+// Get projects for a specific organization
+const getProjectsByOrganizationId = async (organizationId) => {
+
+    const query = `
+        SELECT
+          project_id,
+          organization_id,
+          title,
+          description,
+          location,
+          date
+        FROM project
+        WHERE organization_id = $1
+        ORDER BY date;
+    `;
+
+    const query_params = [organizationId];
+
+    const result = await db.query(query, query_params);
+
+    return result.rows;
+};
+
+
+// Export the model functions
+export { getAllProjects, getProjectsByOrganizationId };
