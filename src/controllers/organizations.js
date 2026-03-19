@@ -2,32 +2,32 @@ import { getAllOrganizations, getOrganizationDetails } from '../models/organizat
 import { getProjectsByOrganizationId } from '../models/projects.js';
 
 const showOrganizationsPage = async (req, res) => {
-
     const organizations = await getAllOrganizations();
-    const title = 'Organizations';
 
     res.render('organizations', {
-        title,
+        title: 'Organizations',
         organizations
     });
-
 };
 
 const showOrganizationDetailsPage = async (req, res) => {
-
     const organizationId = req.params.id;
 
     const organizationDetails = await getOrganizationDetails(organizationId);
+
+    if (!organizationDetails) {
+        return res.status(404).render('errors/404', {
+            title: 'Organization Not Found'
+        });
+    }
+
     const projects = await getProjectsByOrganizationId(organizationId);
 
-    const title = 'Organization Details';
-
     res.render('organization', {
-        title,
+        title: organizationDetails.name,
         organizationDetails,
         projects
     });
-
 };
 
 export { showOrganizationsPage, showOrganizationDetailsPage };
