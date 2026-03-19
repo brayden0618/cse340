@@ -1,0 +1,35 @@
+<%- include('partials/header') %>
+
+<main>
+    <h1><%= project.title %></h1>
+
+    <p><strong>Organization:</strong> <%= project.organization_name %></p>
+    <p><strong>Date:</strong> <%= new Date(project.project_date).toLocaleDateString() %></p>
+    <p><strong>Location:</strong> <%= project.location %></p>
+    <p><%= project.description %></p>
+
+    <h3>Categories</h3>
+
+    <div>
+        <% if (categories && categories.length > 0) { %>
+
+            <% categories.forEach(category => { %>
+
+                <a href="/category/<%= category.category_id %>">
+                    <span style="padding:5px; border:1px solid #000; margin:3px; display:inline-block;">
+                        <%= category.name %>
+                    </span>
+                </a>
+
+            <% }) %>
+
+        <% } else { %>
+
+            <p>No categories assigned.</p>
+
+        <% } %>
+    </div>
+
+</main>
+
+<%- include('partials/footer') %>

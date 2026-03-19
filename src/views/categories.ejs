@@ -5,17 +5,25 @@
 <h1><%= title %></h1>
 
 <ul>
+
 <% if (categories && categories.length > 0) { %>
 
     <% categories.forEach(category => { %>
-        <li><%= category.name %></li>
+
+        <li>
+            <a href="/category/<%= category.category_id %>">
+                <%= category.name %>
+            </a>
+        </li>
+
     <% }) %>
 
 <% } else { %>
 
-    <li>No categories available.</li>
+    <li>No categories found.</li>
 
 <% } %>
+
 </ul>
 
 </main>
