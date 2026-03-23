@@ -1,11 +1,15 @@
-import { getAllOrganizations, getOrganizationDetails } from '../models/organizations.js';
+import { getAllOrganizations, getOrganizationDetails, createOrganization } from '../models/organizations.js';
 import { getProjectsByOrganizationId } from '../models/projects.js';
 
 const processNewOrganizationForm = async (req, res) => {
     const { name, description, contactEmail } = req.body;
-    const logoFilename = 'placeholder-logo.png'; // Use the placeholder logo for all new organizations
+    const logoFilename = 'placeholder-logo.png'; // Use the placeholder logo for all new organizations    
 
     const organizationId = await createOrganization(name, description, contactEmail, logoFilename);
+    
+    // Set a success flash message
+    req.flash('success', 'Organization added successfully!');
+    
     res.redirect(`/organization/${organizationId}`);
 };
 

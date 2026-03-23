@@ -64,4 +64,4 @@ const createOrganization = async (name, description, contactEmail, logoFilename)
     return result.rows[0].organization_id;
 };
 
-export { getAllOrganizations, getOrganizationDetails };
+export { getAllOrganizations, getOrganizationDetails, createOrganization };
