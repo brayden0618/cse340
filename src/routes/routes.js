@@ -1,5 +1,5 @@
 import express from 'express';
-import { showOrganizationDetailsPage, showOrganizationsPage } from '../controllers/organizations.js';
+import { showOrganizationDetailsPage, showOrganizationsPage, showNewOrganizationForm, processNewOrganizationForm } from '../controllers/organizations.js';
 import { showProjectsPage, showHomePage, showProjectDetailsPage } from '../controllers/projects.js';
 import { showCategoryDetailsPage, showCategoriesPage } from '../controllers/categories.js';
 
@@ -25,5 +25,11 @@ router.get('/category/:id', showCategoryDetailsPage);
 
 // Categories list
 router.get('/categories', showCategoriesPage);
+
+// Route for new organization page
+router.get('/new-organization', showNewOrganizationForm);
+
+// Route to handle new organization form submission
+router.post('/new-organization', processNewOrganizationForm);
 
 export default router;
