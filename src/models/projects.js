@@ -80,14 +80,14 @@ const getProjectDetails = async (projectId) => {
 };
 
 // Create a new project
-const createProject = async (title, description, location, date, organizationId) => {
+const createProject = async (title, description, location, project_date, organizationId) => {
     const query = `
-      INSERT INTO projects (title, description, location, date, organization_id)
+      INSERT INTO projects (title, description, location, project_date, organization_id)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING project_id;
     `;
 
-    const query_params = [title, description, location, date, organizationId];
+    const query_params = [title, description, location, project_date, organizationId];
     const result = await db.query(query, query_params);
 
     if (result.rows.length === 0) {
@@ -101,11 +101,36 @@ const createProject = async (title, description, location, date, organizationId)
     return result.rows[0].project_id;
 }
 
+// Update project categories
+const updateProject = async (projectId, title, description, location, projectDate, organizationId) => {
+    const query = `
+        UPDATE projects
+        SET
+            title = $1,
+            description = $2,
+            location = $3,
+            project_date = $4,
+            organization_id = $5
+        WHERE project_id = $6
+        RETURNING project_id;
+    `;
+
+    const params = [title, description, location, projectDate, organizationId, projectId];
+    const result = await db.query(query, params);
+
+    if (result.rows.length === 0) {
+        throw new Error('Failed to update project');
+    }
+
+    return result.rows[0].project_id;
+};
+
 
 export {
     getAllProjects,
     getProjectsByOrganizationId,
     getUpcomingProjects,
     getProjectDetails,
-    createProject
+    createProject,
+    updateProject
 };

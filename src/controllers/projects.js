@@ -1,4 +1,4 @@
-import { getUpcomingProjects, getProjectDetails, createProject } from '../models/projects.js';
+import { getUpcomingProjects, getProjectDetails, createProject, updateProject } from '../models/projects.js';
 import { getCategoriesByProjectId } from '../models/categories.js';
 import { getAllOrganizations } from '../models/organizations.js';
 import { body, validationResult } from 'express-validator';
@@ -103,11 +103,49 @@ const processNewProjectForm = async (req, res) => {
     }
 }
 
+const showEditProjectForm = async (req, res) => {
+    const projectId = req.params.id;
+
+    const project = await getProjectDetails(projectId);
+    const organizations = await getAllOrganizations();
+
+    if (!project || project.length === 0) {
+        return res.status(404).render('errors/404', {
+            title: 'Project Not Found'
+        });
+    }
+
+    res.render('edit-project', {
+        title: 'Edit Project',
+        project: project[0],
+        organizations
+    });
+};
+
+const processEditProjectForm = async (req, res) => {
+    const projectId = req.params.id;
+
+    const { title, description, location, project_date, organization_id } = req.body;
+
+    await updateProject(
+        projectId,
+        title,
+        description,
+        location,
+        project_date,
+        organization_id
+    );
+
+    res.redirect(`/project/${projectId}`);
+};
+
 export {
     showProjectsPage,
     showHomePage,
     showProjectDetailsPage,
     showNewProjectForm,
     processNewProjectForm,
-    projectValidation
+    projectValidation,
+    showEditProjectForm,
+    processEditProjectForm
 };

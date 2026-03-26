@@ -1,5 +1,12 @@
-import { getCategoryById, getProjectsByCategoryId } from '../models/categories.js';
-import { getAllCategories } from '../models/categories.js';
+import {
+    getCategoryById,
+    getProjectsByCategoryId,
+    getAllCategories,
+    getCategoriesByProjectId,
+    updateCategoryAssignments
+} from '../models/categories.js';
+
+import { getProjectDetails } from '../models/projects.js';
 
 // Show all categories page
 const showCategoriesPage = async (req, res) => {
@@ -32,27 +39,43 @@ const showCategoryDetailsPage = async (req, res) => {
     });
 };
 
+// Show assign categories form
 const showAssignCategoriesForm = async (req, res) => {
     const projectId = req.params.projectId;
 
     const projectDetails = await getProjectDetails(projectId);
     const categories = await getAllCategories();
-    const assignedCategories = await getCategoriesByServiceProjectId(projectId);
+    const assignedCategories = await getCategoriesByProjectId(projectId);
 
     const title = 'Assign Categories to Project';
 
-    res.render('assign-categories', { title, projectId, projectDetails, categories, assignedCategories });
+    res.render('assign-categories', {
+        title,
+        projectId,
+        projectDetails,
+        categories,
+        assignedCategories
+    });
 };
 
+// Process assign categories form
 const processAssignCategoriesForm = async (req, res) => {
     const projectId = req.params.projectId;
     const selectedCategoryIds = req.body.categoryIds || [];
-    
-    // Ensure selectedCategoryIds is an array
-    const categoryIdsArray = Array.isArray(selectedCategoryIds) ? selectedCategoryIds : [selectedCategoryIds];
+
+    const categoryIdsArray = Array.isArray(selectedCategoryIds)
+        ? selectedCategoryIds
+        : [selectedCategoryIds];
+
     await updateCategoryAssignments(projectId, categoryIdsArray);
+
     req.flash('success', 'Categories updated successfully.');
     res.redirect(`/project/${projectId}`);
 };
 
-export { showCategoriesPage, showCategoryDetailsPage, showAssignCategoriesForm, processAssignCategoriesForm };
+export {
+    showCategoriesPage,
+    showCategoryDetailsPage,
+    showAssignCategoriesForm,
+    processAssignCategoriesForm
+};

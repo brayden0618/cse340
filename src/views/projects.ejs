@@ -21,6 +21,9 @@
                 <li>
                     <a href="/organization/<%= project.organization_id %>">View Organization</a>
                 </li>
+                <li>
+                    <a href="/edit-project/<%= project.project_id %>">Edit Project</a>
+                </li>
             <% }) %>
         <% } else { %>
             <li>No projects available.</li>
