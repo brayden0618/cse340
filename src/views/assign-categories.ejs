@@ -10,19 +10,24 @@
 
         <div class="category-list">
             <% categories.forEach(category => { %>
-                <label class="category-item">
+                <div class="category-item">
                     <input
                         type="checkbox"
+                        id="category-<%= category.category_id %>"
                         name="categoryIds"
                         value="<%= category.category_id %>"
                         <%= assignedCategories.some(ac => ac.category_id === category.category_id) ? 'checked' : '' %>
-                    >
-                    <span><%= category.name %></span>
-                </label>
+                    />
+
+                    <label for="category-<%= category.category_id %>">
+                        <%= category.name %>
+                    </label>
+                </div>
             <% }) %>
         </div>
 
         <button type="submit">Update Categories</button>
+
     </form>
 </main>
 

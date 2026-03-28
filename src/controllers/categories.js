@@ -11,15 +11,14 @@ import {
 import { getProjectDetails } from '../models/projects.js';
 import { body, validationResult } from 'express-validator';
 
-// Validation
 const categoryValidation = [
     body('name')
         .trim()
-        .isLength({ min: 2 })
-        .withMessage('Name must be at least 2 characters long')
+        .notEmpty()
+        .withMessage('Category name is required')
 ];
 
-// Show all categories
+// Show all categories page
 const showCategoriesPage = async (req, res) => {
     const categories = await getAllCategories();
 
@@ -29,13 +28,16 @@ const showCategoriesPage = async (req, res) => {
     });
 };
 
-// Show category details
+// Show category details page
 const showCategoryDetailsPage = async (req, res) => {
     const categoryId = req.params.id;
 
     const category = await getCategoryById(categoryId);
+
     if (!category) {
-        return res.status(404).render('errors/404', { title: 'Category Not Found' });
+        return res.status(404).render('errors/404', {
+            title: 'Category Not Found'
+        });
     }
 
     const projects = await getProjectsByCategoryId(categoryId);
@@ -47,7 +49,7 @@ const showCategoryDetailsPage = async (req, res) => {
     });
 };
 
-// Assign categories form
+// Show assign categories form
 const showAssignCategoriesForm = async (req, res) => {
     const projectId = req.params.projectId;
 
@@ -55,25 +57,33 @@ const showAssignCategoriesForm = async (req, res) => {
     const categories = await getAllCategories();
     const assignedCategories = await getCategoriesByProjectId(projectId);
 
+    if (!projectDetails || projectDetails.length === 0) {
+        return res.status(404).render('errors/404', {
+            title: 'Project Not Found'
+        });
+    }
+
     res.render('assign-categories', {
-        title: 'Assign Categories',
+        title: 'Assign Categories to Project',
         projectId,
-        projectDetails,
+        projectDetails: projectDetails[0],
         categories,
         assignedCategories
     });
 };
 
-// Process assign categories
+// Process assign categories form
 const processAssignCategoriesForm = async (req, res) => {
     const projectId = req.params.projectId;
-    const selected = req.body.categoryIds || [];
+    const selectedCategoryIds = req.body.categoryIds || [];
 
-    const categoryIds = Array.isArray(selected) ? selected : [selected];
+    const categoryIdsArray = Array.isArray(selectedCategoryIds)
+        ? selectedCategoryIds
+        : [selectedCategoryIds];
 
-    await updateCategoryAssignments(projectId, categoryIds);
+    await updateCategoryAssignments(projectId, categoryIdsArray);
 
-    req.flash('success', 'Categories updated.');
+    req.flash('success', 'Categories updated successfully.');
     res.redirect(`/project/${projectId}`);
 };
 
@@ -85,7 +95,7 @@ const showNewCategoryForm = (req, res) => {
     });
 };
 
-// Process new category
+// Process new category form
 const processNewCategoryForm = async (req, res) => {
     const errors = validationResult(req);
 
@@ -96,24 +106,18 @@ const processNewCategoryForm = async (req, res) => {
         });
     }
 
-    try {
-        await createCategory(req.body.name);
+    const { name } = req.body;
 
-        req.flash('success', 'Category created successfully.');
-        res.redirect('/categories');
-    } catch (error) {
-        console.error(error);
+    await createCategory(name);
 
-        res.render('new-category', {
-            title: 'New Category',
-            errors: [{ msg: 'Something went wrong.' }]
-        });
-    }
+    req.flash('success', 'Category created successfully.');
+    res.redirect('/categories');
 };
 
-// Show edit form
+// Show edit category form
 const showEditCategoryForm = async (req, res) => {
-    const category = await getCategoryById(req.params.id);
+    const categoryId = req.params.id;
+    const category = await getCategoryById(categoryId);
 
     if (!category) {
         return res.status(404).render('errors/404', {
@@ -128,38 +132,28 @@ const showEditCategoryForm = async (req, res) => {
     });
 };
 
-// Process edit
+// Process edit category form
 const processEditCategoryForm = async (req, res) => {
+    const categoryId = req.params.id;
     const errors = validationResult(req);
 
     if (!errors.isEmpty()) {
         return res.render('edit-category', {
             title: 'Edit Category',
             category: {
-                category_id: req.params.id,
+                category_id: categoryId,
                 name: req.body.name
             },
             errors: errors.array()
         });
     }
 
-    try {
-        await updateCategory(req.params.id, req.body.name);
+    const { name } = req.body;
 
-        req.flash('success', 'Category updated successfully.');
-        res.redirect(`/category/${req.params.id}`);
-    } catch (error) {
-        console.error(error);
+    await updateCategory(categoryId, name);
 
-        res.render('edit-category', {
-            title: 'Edit Category',
-            category: {
-                category_id: req.params.id,
-                name: req.body.name
-            },
-            errors: [{ msg: 'Something went wrong.' }]
-        });
-    }
+    req.flash('success', 'Category updated successfully.');
+    res.redirect(`/category/${categoryId}`);
 };
 
 export {
