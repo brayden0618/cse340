@@ -13,7 +13,7 @@ import { body, validationResult } from 'express-validator';
 
 // Validation
 const categoryValidation = [
-    body('name').trim().notEmpty().withMessage('Category name is required')
+    body('name').trim().isLength({ min: 2, max: 100 }).withMessage('Category name must be between 2 and 100 characters')
 ];
 
 // Show all categories
@@ -127,11 +127,23 @@ const processEditCategoryForm = async (req, res) => {
             errors: errors.array()
         });
     }
+    try {
+        await updateCategory(req.params.id, req.body.name);
 
-    await updateCategory(req.params.id, req.body.name);
+        req.flash('success', 'Category updated.');
+        res.redirect(`/category/${req.params.id}`);
+    } catch (error) {
+        console.error(error);
 
-    req.flash('success', 'Category updated.');
-    res.redirect(`/category/${req.params.id}`);
+        res.render('edit-category', {
+            title: 'Edit Category',
+            category: {
+                category_id: req.params.id,
+                name: req.body.name
+            },
+            errors: [{ msg: 'Something went wrong. Please try again.' }]
+        });
+    }
 };
 
 export {

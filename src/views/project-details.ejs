@@ -3,6 +3,12 @@
 <main>
     <h1><%= project.title %></h1>
 
+    <a href="/edit-project/<%= project.project_id %>" class="btn">Edit Project</a>
+
+    <a href="/assign-categories/<%= project.project_id %>" class="btn">
+        Assign Categories
+    </a>
+
     <p><strong>Organization:</strong> <%= project.organization_name %></p>
     <p><strong>Date:</strong> <%= new Date(project.project_date).toLocaleDateString() %></p>
     <p><strong>Location:</strong> <%= project.location %></p>
@@ -14,22 +20,17 @@
         <% if (categories && categories.length > 0) { %>
 
             <% categories.forEach(category => { %>
-
                 <a href="/category/<%= category.category_id %>">
-                    <span style="padding:5px; border:1px solid #000; margin:3px; display:inline-block;">
+                    <span class="category-tag">
                         <%= category.name %>
                     </span>
                 </a>
-
             <% }) %>
 
         <% } else { %>
-
             <p>No categories assigned.</p>
-
         <% } %>
     </div>
-
 </main>
 
 <%- include('partials/footer') %>
