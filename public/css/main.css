@@ -221,3 +221,29 @@ button {
 .project-card p {
   margin: 0.25rem 0;
 }
+
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #f9f9f9;
+}
+
+.category-item:hover {
+  background-color: #eee;
+}
+
+.category-item input {
+  transform: scale(1.2);
+}

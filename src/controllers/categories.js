@@ -13,7 +13,10 @@ import { body, validationResult } from 'express-validator';
 
 // Validation
 const categoryValidation = [
-    body('name').trim().isLength({ min: 2, max: 100 }).withMessage('Category name must be between 2 and 100 characters')
+    body('name')
+        .trim()
+        .isLength({ min: 2 })
+        .withMessage('Name must be at least 2 characters long')
 ];
 
 // Show all categories
@@ -76,7 +79,10 @@ const processAssignCategoriesForm = async (req, res) => {
 
 // Show new category form
 const showNewCategoryForm = (req, res) => {
-    res.render('new-category', { title: 'New Category' });
+    res.render('new-category', {
+        title: 'New Category',
+        errors: []
+    });
 };
 
 // Process new category
@@ -90,12 +96,19 @@ const processNewCategoryForm = async (req, res) => {
         });
     }
 
-    const { name } = req.body;
+    try {
+        await createCategory(req.body.name);
 
-    await createCategory(name);
+        req.flash('success', 'Category created successfully.');
+        res.redirect('/categories');
+    } catch (error) {
+        console.error(error);
 
-    req.flash('success', 'Category created.');
-    res.redirect('/categories');
+        res.render('new-category', {
+            title: 'New Category',
+            errors: [{ msg: 'Something went wrong.' }]
+        });
+    }
 };
 
 // Show edit form
@@ -103,7 +116,9 @@ const showEditCategoryForm = async (req, res) => {
     const category = await getCategoryById(req.params.id);
 
     if (!category) {
-        return res.status(404).render('errors/404', { title: 'Category Not Found' });
+        return res.status(404).render('errors/404', {
+            title: 'Category Not Found'
+        });
     }
 
     res.render('edit-category', {
@@ -127,10 +142,11 @@ const processEditCategoryForm = async (req, res) => {
             errors: errors.array()
         });
     }
+
     try {
         await updateCategory(req.params.id, req.body.name);
 
-        req.flash('success', 'Category updated.');
+        req.flash('success', 'Category updated successfully.');
         res.redirect(`/category/${req.params.id}`);
     } catch (error) {
         console.error(error);
@@ -141,7 +157,7 @@ const processEditCategoryForm = async (req, res) => {
                 category_id: req.params.id,
                 name: req.body.name
             },
-            errors: [{ msg: 'Something went wrong. Please try again.' }]
+            errors: [{ msg: 'Something went wrong.' }]
         });
     }
 };

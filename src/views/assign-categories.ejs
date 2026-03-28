@@ -4,23 +4,21 @@
     <h1><%= projectDetails.title %></h1>
 
     <h2>Assign Categories</h2>
+    <p>Select all categories that apply:</p>
 
     <form action="/assign-categories/<%= projectId %>" method="POST">
 
-        <div class="form-group">
+        <div class="category-list">
             <% categories.forEach(category => { %>
-                <div>
+                <label class="category-item">
                     <input
                         type="checkbox"
-                        id="category-<%= category.category_id %>"
                         name="categoryIds"
                         value="<%= category.category_id %>"
                         <%= assignedCategories.some(ac => ac.category_id === category.category_id) ? 'checked' : '' %>
-                    />
-                    <label for="category-<%= category.category_id %>">
-                        <%= category.name %>
-                    </label>
-                </div>
+                    >
+                    <span><%= category.name %></span>
+                </label>
             <% }) %>
         </div>
 
