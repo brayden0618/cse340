@@ -3,13 +3,13 @@ import db from './db.js';
 // Get all organizations
 const getAllOrganizations = async () => {
     const query = `
-        SELECT
+        SELECT DISTINCT
             organization_id,
             name,
             description,
             contact_email,
             logo_filename
-        FROM organization
+        FROM organizations
         ORDER BY name;
     `;
 
@@ -26,7 +26,7 @@ const getOrganizationDetails = async (organizationId) => {
             description,
             contact_email,
             logo_filename
-        FROM organization
+        FROM organizations
         WHERE organization_id = $1;
     `;
 
@@ -37,15 +37,10 @@ const getOrganizationDetails = async (organizationId) => {
 
 /**
  * Creates a new organization in the database.
- * @param {string} name - The name of the organization.
- * @param {string} description - A description of the organization.
- * @param {string} contactEmail - The contact email for the organization.
- * @param {string} logoFilename - The filename of the organization's logo.
- * @returns {string} The id of the newly created organization record.
  */
 const createOrganization = async (name, description, contactEmail, logoFilename) => {
     const query = `
-      INSERT INTO organization (name, description, contact_email, logo_filename)
+      INSERT INTO organizations (name, description, contact_email, logo_filename)
       VALUES ($1, $2, $3, $4)
       RETURNING organization_id
     `;
@@ -64,9 +59,10 @@ const createOrganization = async (name, description, contactEmail, logoFilename)
     return result.rows[0].organization_id;
 };
 
+// Update organization
 const updateOrganization = async (organizationId, name, description, contactEmail, logoFilename) => {
   const query = `
-    UPDATE organization
+    UPDATE organizations
     SET name = $1, description = $2, contact_email = $3, logo_filename = $4
     WHERE organization_id = $5
     RETURNING organization_id;

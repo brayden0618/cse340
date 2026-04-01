@@ -49,7 +49,7 @@ const getUpcomingProjects = async (limit) => {
             p.project_date,
             o.name AS organization_name
         FROM projects p
-        JOIN organization o ON p.organization_id = o.organization_id
+        JOIN organizations o ON p.organization_id = o.organization_id
         WHERE p.project_date >= CURRENT_DATE
         ORDER BY p.project_date
         LIMIT $1;
@@ -71,7 +71,7 @@ const getProjectDetails = async (projectId) => {
             p.project_date,
             o.name AS organization_name
         FROM projects p
-        JOIN organization o ON p.organization_id = o.organization_id
+        JOIN organizations o ON p.organization_id = o.organization_id
         WHERE p.project_id = $1;
     `;
 
@@ -99,9 +99,9 @@ const createProject = async (title, description, location, project_date, organiz
     }
 
     return result.rows[0].project_id;
-}
+};
 
-// Update project categories
+// Update project
 const updateProject = async (projectId, title, description, location, projectDate, organizationId) => {
     const query = `
         UPDATE projects
@@ -124,7 +124,6 @@ const updateProject = async (projectId, title, description, location, projectDat
 
     return result.rows[0].project_id;
 };
-
 
 export {
     getAllProjects,
