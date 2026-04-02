@@ -53,16 +53,17 @@ app.use((req, res, next) => {
   next();
 });
 
-// Make NODE_ENV available in templates
+// Middleware to set res.locals variables for to all templates
 app.use((req, res, next) => {
-  res.locals.isLoggedIn = false;
-  if (req.session && req.session.user) {
-    res.locals.isLoggedIn = true;
-    res.locals.user = req.session.user;
-  }
-  
-  res.locals.NODE_ENV = NODE_ENV;
-  next();
+    res.locals.isLoggedIn = false;
+    if (req.session && req.session.user) {
+        res.locals.isLoggedIn = true;
+    }
+
+    res.locals.user = req.session.user || null;
+
+    res.locals.NODE_ENV = NODE_ENV;
+    next();
 });
 
 // Use routes

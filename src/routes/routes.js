@@ -2,17 +2,17 @@ import express from 'express';
 
 import {
     showOrganizationDetailsPage, showOrganizationsPage, showNewOrganizationForm, processNewOrganizationForm,
-    organizationValidation, showEditOrganizationForm, processEditOrganizationForm
+    organizationValidation, showEditOrganizationForm, processEditOrganizationForm, requireRole, newOrganizationPage
 } from '../controllers/organizations.js';
 
 import {
     showProjectsPage, showHomePage, showProjectDetailsPage, showNewProjectForm, processNewProjectForm,
-    projectValidation, showEditProjectForm, processEditProjectForm
+    projectValidation, showEditProjectForm, processEditProjectForm, showOrganizationsPage
 } from '../controllers/projects.js';
  
 import {
     showCategoryDetailsPage, showCategoriesPage, showAssignCategoriesForm, processAssignCategoriesForm, showNewCategoryForm
-    , categoryValidation, processNewCategoryForm, showEditCategoryForm, processEditCategoryForm
+    , categoryValidation, processNewCategoryForm, showEditCategoryForm, processEditCategoryForm, showOrganizationsPage
 } from '../controllers/categories.js';
 
 import { showUserRegistrationForm, processUserRegistrationForm, showLoginForm, processLoginForm, processLogout, requireLogin, showDashboard } from '../controllers/users.js';
@@ -91,5 +91,11 @@ router.get('/logout', processLogout);
 
 // Protected dashboard route
 router.get('/dashboard', requireLogin, showDashboard);
+
+// Route for new organization page
+router.get('/new-organization', requireRole('admin'), newOrganizationPage);
+
+// Route to handle new organization form submission
+router.post('/new-organization', requireRole('admin'), organizationValidation, processNewOrganizationForm);
 
 export default router;
