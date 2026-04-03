@@ -1,12 +1,11 @@
 import bcrypt from 'bcrypt';
 import { createUser, authenticateUser } from '../models/users.js';
 
-// Show registration form
+// Registration
 const showUserRegistrationForm = (req, res) => {
     res.render('register', { title: 'Register' });
 };
 
-// Handle registration
 const processUserRegistrationForm = async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -19,18 +18,17 @@ const processUserRegistrationForm = async (req, res) => {
         req.flash('success', 'Registration successful! Please log in.');
         res.redirect('/login');
     } catch (error) {
-        console.error('Error registering user:', error);
-        req.flash('error', 'An error occurred during registration.');
+        console.error(error);
+        req.flash('error', 'Registration failed.');
         res.redirect('/register');
     }
 };
 
-// Show login form
+// Login
 const showLoginForm = (req, res) => {
     res.render('login', { title: 'Login' });
 };
 
-// Handle login
 const processLoginForm = async (req, res) => {
     const { email, password } = req.body;
 
@@ -38,40 +36,45 @@ const processLoginForm = async (req, res) => {
         const user = await authenticateUser(email, password);
 
         if (!user) {
-            req.flash('error', 'Invalid email or password.');
+            req.flash('error', 'Invalid credentials.');
             return res.redirect('/login');
         }
 
-        // Store user in session ✅
         req.session.user = user;
 
-        if (process.env.NODE_ENV === 'development') {
-            console.log('User logged in:', user);
-        }
-
-        req.flash('success', 'Login successful!');
+        req.flash('success', 'Logged in successfully.');
         res.redirect('/dashboard');
     } catch (error) {
-        console.error('Error during login:', error);
-        req.flash('error', 'An error occurred during login.');
+        console.error(error);
+        req.flash('error', 'Login error.');
         res.redirect('/login');
     }
 };
 
-// Require login middleware
+// Middleware: require login
 const requireLogin = (req, res, next) => {
     if (!req.session || !req.session.user) {
-        req.flash('error', 'You must be logged in to access this page.');
+        req.flash('error', 'Please log in first.');
         return res.redirect('/login');
     }
     next();
 };
 
-// Logout
-const processLogout = (req, res) => {
-    req.session.destroy(() => {
-        res.redirect('/login');
-    });
+// Middleware: require role
+const requireRole = (role) => {
+    return (req, res, next) => {
+        if (!req.session || !req.session.user) {
+            req.flash('error', 'Please log in first.');
+            return res.redirect('/login');
+        }
+
+        if (req.session.user.role !== role) {
+            req.flash('error', 'Access denied.');
+            return res.redirect('/dashboard');
+        }
+
+        next();
+    };
 };
 
 // Dashboard
@@ -81,25 +84,36 @@ const showDashboard = (req, res) => {
     res.render('dashboard', {
         title: 'Dashboard',
         name: user.name,
-        email: user.email
+        email: user.email,
+        role: user.role
     });
 };
 
-// Require specific role
-const requireRole = (role) => {
-    return (req, res, next) => {
-        if (!req.session || !req.session.user) {
-            req.flash('error', 'You must be logged in first.');
-            return res.redirect('/login');
-        }
+// Logout
+const processLogout = (req, res) => {
+    req.session.destroy(() => {
+        res.redirect('/login');
+    });
+};
 
-        if (req.session.user.role_name !== role) {
-            req.flash('error', 'Access denied.');
-            return res.redirect('/');
-        }
+// USERS PAGE (ADMIN ONLY)
+const showUsersPage = async (req, res) => {
+    try {
+        const result = await db.query(
+            `SELECT user_id, name, email, role
+             FROM users
+             ORDER BY name`
+        );
 
-        next();
-    };
+        res.render('users', {
+            title: 'Users',
+            users: result.rows
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
 };
 
 export {
@@ -108,7 +122,8 @@ export {
     showLoginForm,
     processLoginForm,
     requireLogin,
+    requireRole,
     processLogout,
     showDashboard,
-    requireRole
+    showUsersPage
 };
