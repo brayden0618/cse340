@@ -165,13 +165,13 @@ const processEditOrganizationForm = async (req, res) => {
 const requireRole = (role) => {
     return (req, res, next) => {
         // Make sure user is logged in
-        if (!req.user) {
+        if (!req.session || !req.session.user) {
             req.flash('error', 'Please log in first');
             return res.redirect('/login');
         }
 
         // Check role
-        if (req.user.role !== role) {
+        if (req.session.user.role !== role) {
             req.flash('error', 'Access denied');
             return res.redirect('/');
         }

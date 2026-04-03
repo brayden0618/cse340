@@ -13,15 +13,9 @@
         <% organizations.forEach(organization => { %>
 
             <li>
-
                 <a href="/organization/<%= organization.organization_id %>">
                     <%= organization.name %>
                 </a>
-
-                <% if (user && user.role_name === 'admin') { %>
-                    <a href="/new-organization">Add New Organization</a>
-                <% } %>
-
             </li>
 
         <% }) %>
@@ -32,9 +26,12 @@
 
     <% } %>
 
-    <p><a href="/new-organization">Add a new organization</a></p>
-
     </ul>
+
+    <!-- Admin-only button -->
+    <% if (user && user.role_name === 'admin') { %>
+        <p><a href="/new-organization">Add New Organization</a></p>
+    <% } %>
 
 </main>
 
