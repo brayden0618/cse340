@@ -1,3 +1,4 @@
+import db from '../models/db.js';
 import bcrypt from 'bcrypt';
 import { createUser, authenticateUser } from '../models/users.js';
 
@@ -13,12 +14,12 @@ const processUserRegistrationForm = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const passwordHash = await bcrypt.hash(password, salt);
 
-        await createUser(name, email, passwordHash);
+        await createUser(name, email, passwordHash, 'user');
 
         req.flash('success', 'Registration successful! Please log in.');
         res.redirect('/login');
     } catch (error) {
-        console.error(error);
+        console.error('Registration error:', error.message);
         req.flash('error', 'Registration failed.');
         res.redirect('/register');
     }
@@ -42,10 +43,12 @@ const processLoginForm = async (req, res) => {
 
         req.session.user = user;
 
+        console.log(req.session.user);
+
         req.flash('success', 'Logged in successfully.');
         res.redirect('/dashboard');
     } catch (error) {
-        console.error(error);
+        console.error('Login error:', error.message);
         req.flash('error', 'Login error.');
         res.redirect('/login');
     }
@@ -96,13 +99,14 @@ const processLogout = (req, res) => {
     });
 };
 
-// USERS PAGE (ADMIN ONLY)
+// Users page
 const showUsersPage = async (req, res) => {
     try {
         const result = await db.query(
-            `SELECT user_id, name, email, role
-             FROM users
-             ORDER BY name`
+            `SELECT u.user_id, u.name, u.email, r.role_name
+             FROM users u
+             JOIN roles r ON u.role_id = r.role_id
+             ORDER BY u.name`
         );
 
         res.render('users', {
