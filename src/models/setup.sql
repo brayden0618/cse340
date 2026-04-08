@@ -99,8 +99,7 @@ INSERT INTO roles (role_name, role_description) VALUES
     ('user', 'Standard user with basic access'),
     ('admin', 'Administrator with full system access');
 
--- Verify the data was inserted
-SELECT * FROM roles;
+-- Verify the data was inserted correctly
 
 CREATE TABLE users (
     user_id SERIAL PRIMARY KEY,
@@ -111,4 +110,43 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+SELECT * FROM roles;
+
+SELECT u.user_id, u.name, u.email, r.role_name
+FROM users u
+JOIN roles r ON u.role_id = r.role_id
+ORDER BY u.user_id;
+
+SELECT u.user_id, u.name, u.email, r.role_name
+FROM users u
+JOIN roles r ON u.role_id = r.role_id
+WHERE u.email = 'brayden.wayman@gmail.com';
+
+UPDATE users
+SET role_id = (
+    SELECT role_id
+    FROM roles
+    WHERE role_name = 'admin'
+)
+WHERE email = 'brayden.wayman@gmail.com';
+
 SELECT * FROM users;
+
+CREATE TABLE volunteers (
+    volunteer_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    project_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY(user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_project
+        FOREIGN KEY(project_id)
+        REFERENCES projects(project_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT unique_volunteer UNIQUE(user_id, project_id)
+);

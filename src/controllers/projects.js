@@ -1,6 +1,7 @@
 import { getUpcomingProjects, getProjectDetails, createProject, updateProject } from '../models/projects.js';
 import { getCategoriesByProjectId } from '../models/categories.js';
 import { getAllOrganizations } from '../models/organizations.js';
+import { isUserVolunteer } from '../models/volunteers.js';
 import { body, validationResult } from 'express-validator';
 
 const NUMBER_OF_UPCOMING_PROJECTS = 5;
@@ -50,6 +51,13 @@ const showProjectDetailsPage = async (req, res) => {
     const results = await getProjectDetails(projectId);
     const project = results[0];
 
+    let isVolunteer = false;
+
+    if (req.session.user) {
+        isVolunteer = await isUserVolunteer(req.session.user.user_id, projectId);
+        project.isVolunteer = isVolunteer;
+    }
+
     if (!project) {
         return res.status(404).render('errors/404', {
             title: 'Project Not Found'
@@ -61,7 +69,9 @@ const showProjectDetailsPage = async (req, res) => {
     res.render('project-details', {
         title: project.title,
         project,
-        categories
+        categories,
+        isVolunteer,
+        user: req.session.user
     });
 };
 

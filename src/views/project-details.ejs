@@ -31,6 +31,22 @@
             <p>No categories assigned.</p>
         <% } %>
     </div>
+
+    <% if (user) { %>
+        <% if (isVolunteer) { %>
+            <p style="color: green; font-weight: bold;">
+                ✔ You are volunteering for this project
+            </p>
+
+            <form action="/projects/<%= project.project_id %>/unvolunteer" method="POST">
+                <button type="submit">Remove Volunteer</button>
+            </form>
+        <% } else { %>
+            <form action="/projects/<%= project.project_id %>/volunteer" method="POST">
+                <button type="submit">Volunteer</button>
+            </form>
+        <% } %>
+    <% } %>
 </main>
 
 <%- include('partials/footer') %>
